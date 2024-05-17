@@ -11,8 +11,8 @@ export class CreateUserDto {
   @IsString()
   password: string;
 
-  @IsEnum(['CLIENT', 'ADMIN'], {
-    message: 'valid role required',
-  })
-  role: 'CLIENT' | 'ADMIN';
+  // @IsEnum(['CLIENT', 'ADMIN'], {
+  //   message: 'valid role required',
+  // })
+  // role: 'CLIENT' | 'ADMIN';
 }
