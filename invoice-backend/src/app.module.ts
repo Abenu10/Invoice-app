@@ -3,9 +3,11 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
+import { InvoiceModule } from './invoice/invoice.module';
+import { UserModule } from './user/user.module';
 
 @Module({
-  imports: [DatabaseModule, ConfigModule.forRoot(), DatabaseModule],
+  imports: [DatabaseModule, ConfigModule.forRoot(), DatabaseModule, InvoiceModule, UserModule],
   controllers: [AppController],
   providers: [AppService],
 })

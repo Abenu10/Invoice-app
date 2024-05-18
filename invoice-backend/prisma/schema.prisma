@@ -13,19 +13,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  CLIENT
-  ADMIN
-}
+// enum Role {
+//   CLIENT
+//   ADMIN
+// }
 
 model User {
   id                 String    @id @default(cuid())
   name               String
   email              String    @unique
-  role               Role      @default(CLIENT)
+  password String
+  // role               Role      @default(CLIENT)
   invoices           Invoice[] @relation("UserInvoices")
-  createdByInvoices  Invoice[] @relation("CreatedByUser")
-  modifiedByInvoices Invoice[] @relation("ModifiedByUser")
 }
 
 model Invoice {
@@ -38,10 +37,6 @@ model Invoice {
   dueDate      DateTime
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-  createdById  String
-  createdBy    User      @relation(fields: [createdById], references: [id], name: "CreatedByUser")
-  modifiedById String
-  modifiedBy   User      @relation(fields: [modifiedById], references: [id], name: "ModifiedByUser")
   status       String
 }
 
