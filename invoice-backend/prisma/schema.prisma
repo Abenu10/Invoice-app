@@ -11,6 +11,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  
 }
 
 // enum Role {
@@ -27,6 +28,11 @@ model User {
   invoices           Invoice[] @relation("UserInvoices")
 }
 
+enum InvoiceStatus {
+  PAID
+  UNPAID
+  PENDING
+}
 model Invoice {
   id           String    @id @default(cuid())
   number       Int       @unique
@@ -37,7 +43,7 @@ model Invoice {
   dueDate      DateTime
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-  status       String
+  status       InvoiceStatus
 }
 
 model Product {
