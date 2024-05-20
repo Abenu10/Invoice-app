@@ -44,4 +44,24 @@ export class AuthService {
     }
     throw new UnauthorizedException();
   }
+
+  async refreshToken(User: any) {
+    const payload = {
+      id: User.id,
+      username: User.username,
+      sub: User.sub,
+    };
+    return {
+      backendTokens: {
+        accessToken: await this.jwtService.signAsync(payload, {
+          expiresIn: '1h',
+          secret: process.env.jwtSecretKey,
+        }),
+        refreshToken: await this.jwtService.signAsync(payload, {
+          expiresIn: '7d',
+          secret: process.env.jwtRefreshTokenKey,
+        }),
+      },
+    };
+  }
 }
