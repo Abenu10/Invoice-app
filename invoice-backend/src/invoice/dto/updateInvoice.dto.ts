@@ -9,7 +9,7 @@ import {
   IsArray,
   IsEnum,
 } from 'class-validator';
-import { UpdateProductDto } from './../../product/dto/updateproduct.dto';
+import { UpdateProductDto } from './updateproduct.dto';
 
 enum InvoiceStatus {
   PAID = 'PAID',

@@ -9,7 +9,7 @@ export class CreateProductDto {
   @IsNotEmpty()
   price: number;
 
-  // @IsString()
-  // @IsNotEmpty()
-  // invoiceId: string;
+  @IsString()
+  @IsNotEmpty()
+  invoiceId: string;
 }

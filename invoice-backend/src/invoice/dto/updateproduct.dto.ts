@@ -9,8 +9,10 @@ export class UpdateProductDto {
   @IsNumber()
   price?: number;
 
-  
-  @IsOptional()
+
   @IsString()
   id?: string;
+
+  @IsString()
+  invoiceId?: string;
 }

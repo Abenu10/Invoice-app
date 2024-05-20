@@ -6,7 +6,7 @@ import {
   IsArray,
   IsEnum,
 } from 'class-validator';
-import { CreateProductDto } from './../../product/dto/product.dto';
+import { CreateProductDto } from './product.dto';
 
 export enum InvoiceStatus {
   PAID = 'PAID',
@@ -26,8 +26,8 @@ export class CreateInvoiceDto {
   @IsArray()
   products: CreateProductDto[];
 
-  @IsNumber()
-  total: number;
+  // @IsNumber()
+  // total: number;
 
   @IsString()
   dueDate: Date;
