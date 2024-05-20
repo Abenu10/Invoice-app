@@ -1,50 +1,85 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { Prisma } from '@prisma/client';
 import { UpdateInvoiceDto } from './dto/updateInvoice.dto';
 import { CreateInvoiceDto } from './dto/invoice.dto';
+import { UserService } from 'src/user/user.service';
 @Injectable()
 export class InvoiceService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly userService: UserService,
+  ) {}
 
   async findAll() {
-    return this.databaseService.invoice.findMany({
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+    try {
+      return this.databaseService.invoice.findMany({
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          products: {
+            select: {
+              id: true,
+              name: true,
+              price: true,
+            },
           },
         },
-        products: true,
-      },
-    });
+      });
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Error fetching invoices ');
+    }
   }
 
   async findOne(id: string) {
-    return this.databaseService.invoice.findUnique({
-      where: { id },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+    try {
+      return this.databaseService.invoice.findUnique({
+        where: { id },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          products: {
+            select: {
+              id: true,
+              name: true,
+              price: true,
+            },
           },
         },
-        products: true,
-      },
-    });
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('Error fetching invoices ');
+    }
   }
 
   async create(createInvoiceDto: CreateInvoiceDto) {
-    const { userId, number, products, total, dueDate, status } =
-      createInvoiceDto;
-    return this.databaseService.invoice.create({
+    const { userId, products, total, dueDate, status } = createInvoiceDto;
+
+    // Check if the user exists
+    const user = await this.userService.getUserById(userId);
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+
+    const newInvoice = await this.databaseService.invoice.create({
       data: {
         user: { connect: { id: userId } },
-        number,
+
         products: {
           create: products.map((product) => ({
             name: product.name,
@@ -52,15 +87,30 @@ export class InvoiceService {
           })),
         },
         total,
-        dueDate,
+        dueDate: new Date().toISOString(),
         status,
       },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        products: {
+          select: {
+            id: true,
+            name: true,
+            price: true,
+          },
+        },
+      },
     });
+    return newInvoice;
   }
-
   async update(id: string, updateInvoiceDto: UpdateInvoiceDto) {
-    const { userId, number, products, total, dueDate, status } =
-      updateInvoiceDto;
+    const { userId, products, total, dueDate, status } = updateInvoiceDto;
 
     if (userId) {
       // Check if the userId exists
@@ -72,25 +122,67 @@ export class InvoiceService {
       }
     }
 
-    return this.databaseService.invoice.update({
+    const updatedInvoice = await this.databaseService.invoice.update({
       where: { id },
       data: {
         ...(userId ? { user: { connect: { id: userId } } } : {}),
-        number,
+
         products: {
-          update: products.map((product) => ({
+          update: products?.map((product) => ({
             where: { id: product.id },
             data: { name: product.name, price: product.price },
           })),
         },
         total,
-        dueDate,
+        dueDate: new Date().toISOString(),
         status,
       },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        products: {
+          select: {
+            id: true,
+            name: true,
+            price: true,
+          },
+        },
+      },
     });
+    return updatedInvoice;
   }
 
   async delete(id: string) {
-    return this.databaseService.invoice.delete({ where: { id } });
+    // First, delete the related products
+    await this.databaseService.product.deleteMany({
+      where: { invoiceId: id },
+    });
+
+    // Then, delete the invoice
+    const deletedInvoice = await this.databaseService.invoice.delete({
+      where: { id },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        products: {
+          select: {
+            id: true,
+            name: true,
+            price: true,
+          },
+        },
+      },
+    });
+    return deletedInvoice;
   }
 }

@@ -19,9 +19,9 @@ export class CreateInvoiceDto {
   @IsNotEmpty()
   userId: string;
 
-  @IsNumber()
-  @IsNotEmpty()
-  number: number;
+  // @IsNumber()
+  // @IsNotEmpty()
+  // number: number;
 
   @IsArray()
   products: CreateProductDto[];
@@ -29,7 +29,7 @@ export class CreateInvoiceDto {
   @IsNumber()
   total: number;
 
-  @IsDate()
+  @IsString()
   dueDate: Date;
 
   @IsEnum(InvoiceStatus)

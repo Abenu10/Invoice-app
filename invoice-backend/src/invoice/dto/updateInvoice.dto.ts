@@ -22,9 +22,9 @@ export class UpdateInvoiceDto {
   @IsString()
   userId?: string;
 
-  @IsOptional()
-  @IsNumber()
-  number?: number;
+  // @IsOptional()
+  // @IsNumber()
+  // number?: number;
 
   @IsOptional()
   @IsArray()
@@ -35,7 +35,7 @@ export class UpdateInvoiceDto {
   total?: number;
 
   @IsOptional()
-  @IsDate()
+  @IsString()
   dueDate?: Date;
 
   @IsOptional()

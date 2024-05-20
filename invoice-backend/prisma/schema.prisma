@@ -35,15 +35,16 @@ enum InvoiceStatus {
 }
 model Invoice {
   id           String    @id @default(cuid())
-  number       Int       @unique
+    number   Int      @default(autoincrement()) @unique
   userId       String
   user         User      @relation(fields: [userId], references: [id], name: "UserInvoices")
   products     Product[]
   total        Float
-  dueDate      DateTime
+  dueDate      String
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   status       InvoiceStatus
+   @@map("invoices")
 }
 
 model Product {
