@@ -5,6 +5,7 @@ import {
   NotFoundException,
   Param,
 } from '@nestjs/common';
+
 import { DatabaseService } from 'src/database/database.service';
 import { Prisma } from '@prisma/client';
 import { UpdateInvoiceDto } from './dto/updateInvoice.dto';
@@ -21,6 +22,7 @@ export class InvoiceService {
 
   async findAll() {
     try {
+      // const token = req.headers.authorization;
       return this.databaseService.invoice.findMany({
         include: {
           user: {
@@ -44,6 +46,32 @@ export class InvoiceService {
       throw new InternalServerErrorException('Error fetching invoices ');
     }
   }
+ async findAllByUser(userId: string) {
+    try {
+      return this.databaseService.invoice.findMany({
+        where: { userId },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          products: {
+            select: {
+              id: true,
+              name: true,
+              price: true,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('Error fetching invoices ');
+    }
+  }
+
 
   async findOne(id: string) {
     try {
@@ -71,10 +99,9 @@ export class InvoiceService {
     }
   }
 
-  async create(createInvoiceDto: CreateInvoiceDto) {
-    const { userId, products, dueDate, status } = createInvoiceDto;
+  async create(createInvoiceDto: CreateInvoiceDto, userId: string) {
+    const { products, dueDate, status } = createInvoiceDto;
 
-    // Check if the user exists
     const user = await this.userService.getUserById(userId);
     if (!user) {
       throw new NotFoundException(`User with id ${userId} not found`);
@@ -114,17 +141,12 @@ export class InvoiceService {
     });
     return newInvoice;
   }
-  async update(id: string, updateInvoiceDto: UpdateInvoiceDto) {
-    const { userId, products, dueDate, status } = updateInvoiceDto;
+  async update(id: string, updateInvoiceDto: UpdateInvoiceDto, userId: string) {
+    const { products, dueDate, status } = updateInvoiceDto;
 
-    if (userId) {
-      // Check if the userId exists
-      const user = await this.databaseService.user.findFirst({
-        where: { id: userId },
-      });
-      if (!user) {
-        throw new NotFoundException(`User with id ${userId} not found`);
-      }
+    const user = await this.userService.getUserById(userId);
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found`);
     }
     const total = products.reduce((acc, product) => acc + product.price, 0);
 
@@ -198,20 +220,6 @@ export class InvoiceService {
     return deletedInvoice;
   }
 
-  // update total field in teh  invoice
-  private async updateInvoiceTotal(invoiceId: string) {
-    const products = await this.databaseService.product.findMany({
-      where: { invoiceId },
-    });
-
-    const total = products.reduce((acc, product) => acc + product.price, 0);
-
-    await this.databaseService.invoice.update({
-      where: { id: invoiceId },
-      data: { total },
-    });
-  }
-
   // ? i can use dto here
   async addProductToInvoice(createProductDto: CreateProductDto) {
     const { invoiceId, name, price } = createProductDto;
@@ -261,31 +269,4 @@ export class InvoiceService {
 
     return product;
   }
-  // async getInvoiceProducts(invoiceId: string) {
-  //   try {
-  //     return this.databaseService.product.findMany({
-  //       where: { invoiceId },
-  //     });
-  //   } catch (error) {
-  //     console.error(error);
-  //     throw new InternalServerErrorException('Error fetching invoice products');
-  //   }
-  // }
-
-  // async getTotal(invoiceId: string) {
-  //   try {
-  //     const invoice = await this.databaseService.invoice.findUnique({
-  //       where: { id: invoiceId },
-  //     });
-
-  //     if (!invoice) {
-  //       throw new NotFoundException(`Invoice with id ${invoiceId} not found`);
-  //     }
-
-  //     return invoice.total;
-  //   } catch (error) {
-  //     console.error(error);
-  //     throw new InternalServerErrorException('Error fetching invoice total');
-  //   }
-  // }
 }

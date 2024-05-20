@@ -11,9 +11,16 @@ export class UserController {
   async getUserProfile(@Param('id') id: string) {
     return await this.UserService.findById(id);
   }
+
+  @UseGuards(JwtGuard)
   @Get()
   async getAllUser() {
     return await this.UserService.findAll();
   }
+  
+  // @UseGuards(JwtGuard)
+  // @Get()
+  // async getUserByToken()
+
 }
       

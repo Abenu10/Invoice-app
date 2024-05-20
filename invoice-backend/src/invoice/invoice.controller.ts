@@ -8,6 +8,9 @@ import {
   Post,
   Put,
   UseGuards,
+  Req,
+  Res,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InvoiceService } from './invoice.service';
 import { CreateInvoiceDto } from './dto/invoice.dto';
@@ -25,6 +28,16 @@ export class InvoiceController {
   async findAll() {
     return await this.invoiceService.findAll();
   }
+  @UseGuards(JwtGuard)
+  @Get('/user')
+  async findAllByUser(@Req() req: Request) {
+    const user = req['user'];
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    const userId = user.id;
+    return await this.invoiceService.findAllByUser(userId);
+  }
 
   @UseGuards(JwtGuard)
   @Get(':id')
@@ -33,17 +46,31 @@ export class InvoiceController {
   }
   @UseGuards(JwtGuard)
   @Post()
-  async create(@Body() createInvoiceDto: CreateInvoiceDto) {
-    return this.invoiceService.create(createInvoiceDto);
+  async create(
+    @Req() req: Request,
+    @Body() createInvoiceDto: CreateInvoiceDto,
+  ) {
+    const user = req['user'];
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    const userId = user.id;
+    return this.invoiceService.create(createInvoiceDto, userId);
   }
 
   @UseGuards(JwtGuard)
   @Patch(':id')
   async update(
+    @Req() req: Request,
     @Param('id') id: string,
     @Body() updateInvoiceDto: UpdateInvoiceDto,
   ) {
-    return this.invoiceService.update(id, updateInvoiceDto);
+    const user = req['user'];
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    const userId = user.id;
+    return this.invoiceService.update(id, updateInvoiceDto, userId);
   }
 
   @UseGuards(JwtGuard)
@@ -67,22 +94,5 @@ export class InvoiceController {
     return await this.invoiceService.updateProduct(invoiceId, updateProductDto);
   }
 
-  //   // remove product from invoice
-  //   @UseGuards(JwtGuard)
-  //   @Put(':id/remove-product')
-  //   async remove(@Body() body: any) {
-  //     return await this.invoiceService.remove(body);
-  //   }
-  //   // get invoice products
-  //   @UseGuards(JwtGuard)
-  //   @Get(':id/products')
-  //   async getInvoiceProducts(@Param('id') id: string) {
-  //     return await this.invoiceService.getInvoiceProducts(id);
-  //   }
-  //   // get invoice total
-  //   @UseGuards(JwtGuard)
-  //   @Get(':id/total')
-  //   async getTotal(@Param('id') id: string) {
-  //     return await this.invoiceService.getTotal(id);
-  // }
+
 }
