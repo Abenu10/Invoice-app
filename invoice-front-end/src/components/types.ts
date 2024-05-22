@@ -15,7 +15,7 @@ export interface InvoiceType {
   products: Product[];
 }
 
-export interface ProductType {
+export interface Product {
   id: string;
   name: string;
   price: number;

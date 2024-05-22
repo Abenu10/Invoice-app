@@ -1,4 +1,4 @@
-
+// "use client"
 // import styles from './page.module.css';
 // import Switch from '@mui/material/Switch';
 
@@ -98,29 +98,34 @@
 //   );
 // }
 
-
-import { getInvoices } from '@lib/invoices';
+import {getInvoices} from '@lib/invoices';
 import InvoiceList from '@components/InvoiceList';
 import Invoice from '@components/Invoice';
-import { InvoiceType } from '@components/types';
-import { useEffect, useState } from 'react';
+import {InvoiceType} from '@components/types';
+import InvoiceTable from '@components/InvoiceTable';
 
-export default function InvoicePage() {
-  const [invoices, setInvoices] = useState<InvoiceType[]>([]);
+export default async function InvoicePage() {
+  let invoices: InvoiceType[] = [];
+  // let isLoading = true;
 
-  useEffect(() => {
-    const fetchInvoices = async () => {
-      const data = await getInvoices();
-      setInvoices(data);
-    };
-    fetchInvoices();
-  }, []);
+  try {
+    invoices = await getInvoices();
+    // isLoading = false;
+  } catch (error) {
+    console.error('Error fetching invoices:', error);
+  }
 
-  return (
-    <div>
-      {invoices.map((invoice) => (
-        <Invoice key={invoice.id} invoice={invoice} />
-      ))}
-    </div>
-  );
+  return <InvoiceTable invoices={invoices} />;
 }
+//   const invoices: InvoiceType[] = await getInvoices();
+//   console.log(invoices)
+
+//   return (
+//     <div>
+//       {invoices.map((invoice) => (
+//         <Invoice key={invoice.id} invoice={invoice} />
+//       ))}
+//     </div>
+//   );
+// }
+// function to add two nubers
