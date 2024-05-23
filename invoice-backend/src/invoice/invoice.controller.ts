@@ -23,7 +23,7 @@ import { UpdateProductDto } from './dto/updateproduct.dto';
 export class InvoiceController {
   constructor(private invoiceService: InvoiceService) {}
 
-  @UseGuards(JwtGuard)
+  // @UseGuards(JwtGuard)
   @Get()
   async findAll() {
     return await this.invoiceService.findAll();
@@ -93,6 +93,4 @@ export class InvoiceController {
   ) {
     return await this.invoiceService.updateProduct(invoiceId, updateProductDto);
   }
-
-
 }

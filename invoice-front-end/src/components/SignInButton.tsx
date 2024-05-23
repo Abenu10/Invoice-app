@@ -1,38 +1,38 @@
-"use client"
+'use client';
 
-import { Box, Link as MuiLink, Typography } from '@material-ui/core';
+import {Box, Link as MuiLink, Typography, Button} from '@material-ui/core';
 import NextLink from 'next/link';
-import { useSession } from 'next-auth/react';
+import {useSession} from 'next-auth/react';
 
 const SignInButton = () => {
-  const { data: session } = useSession();
+  const {data: session} = useSession();
 
-  if (session && session.user) 
+  if (session && session.user)
     return (
-      <Box display="flex" justifyContent="flex-end" alignItems="center">
+      <Box display='flex' justifyContent='flex-end' alignItems='center'>
         <Typography variant='body1' color='primary'>
           {session.user.name}
         </Typography>
-        <NextLink href="/api/auth/signout" passHref>
-          <MuiLink color="primary">
-            <Typography variant="body1">Sign Out</Typography>
-          </MuiLink>
+        <NextLink href='/api/auth/signout' passHref>
+          <Button variant='contained' color='primary'>
+            Sign Out
+          </Button>
         </NextLink>
       </Box>
     );
-  
 
   return (
-    <Box display="flex" justifyContent="flex-end" alignItems="center">
-      <NextLink href="/api/auth/signin" passHref>
-        <MuiLink color="primary">
-          <Typography variant="body1">Sign In</Typography>
-        </MuiLink>
+    <Box display='flex' justifyContent='flex-end' alignItems='center'>
+      <NextLink href='/api/auth/signin' passHref>
+        <Button variant='contained' color='primary'>
+
+          Sign In
+        </Button>
       </NextLink>
-      <NextLink href="/signup" passHref>
-        <MuiLink style={{ backgroundColor: 'green', color: 'lightgreen', padding: '8px', borderRadius: '4px' }}>
-          <Typography variant="body1">Sign Up</Typography>
-        </MuiLink>
+      <NextLink href='/signup' passHref>
+        <Button variant='contained' color='secondary'>
+          Sign Up
+        </Button>
       </NextLink>
     </Box>
   );
