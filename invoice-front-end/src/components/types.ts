@@ -13,6 +13,7 @@ export interface InvoiceType {
     email: string;
   };
   products: Product[];
+  isNew?: boolean;
 }
 
 export interface Product {

@@ -103,6 +103,7 @@ import InvoiceList from '@components/InvoiceList';
 import Invoice from '@components/Invoice';
 import {InvoiceType} from '@components/types';
 import InvoiceTable from '@components/InvoiceTable';
+import InvoiceGrid from '@components/InvoiceGrid';
 
 export default async function InvoicePage() {
   let invoices: InvoiceType[] = [];
@@ -115,7 +116,8 @@ export default async function InvoicePage() {
     console.error('Error fetching invoices:', error);
   }
 
-  return <InvoiceTable invoices={invoices} />;
+  // return <InvoiceTable invoices={invoices} />;
+  return <InvoiceGrid invoices={invoices} />;
 }
 //   const invoices: InvoiceType[] = await getInvoices();
 //   console.log(invoices)
